@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+enable sshd.service
+# I am a fan
+enable iwd.service
+# required by wayfire
+enable qemu-guest-agent.service
+enable spice-vdagentd.service
+# enable seatd.service
+enable systemd-resolved.service
+#enable sddm.service
+enable plasmalogin.service
+enable libvirtd.service
+enable dbus-broker.service
+enable upower.service
+enable udisks2.service
+enable accounts-daemon.service
+enable fstrim.timer
+enable lm_sensors.service
+enable bluetooth.service
+enable scx_loader.service
+
+# Laptop hardware & power management
+#enable thermald.service
+
+# Hardware updates & health
+enable fwupd.service
+enable smartd.service
+
+# Realtime scheduling for smooth audio (PipeWire)
+enable rtkit-daemon.service
+
+# Modern power, thermal, and performance management
+enable tuned.service

@@ -50,3 +50,32 @@ EOF
 
 EOF
 )
+
+# I love static libraries, thats why I love to kill em
+find /usr | grep \\.a$ | xargs rm
+
+# gotta remove cruft the old fashion way to avoid duc indexing stale content
+rm -Rf \
+        /usr/include \
+        /usr/share/wallpapers/ \
+        /usr/share/man \
+        /usr/share/doc \
+        /usr/share/icons/oxygen \
+        /usr/share/locale \
+        /usr/share/gtk-doc \
+        /usr/lib/firmware/intel \
+        /usr/lib/firmware/intel-ucode
+
+fc-cache -f
+
+# goofy; duc does not create the directory tree
+# goofier; only /usr is going so this provisioning has to be under /usr if we want it packed
+#mkdir -p /root/.cache/duc
+mkdir -p /usr/lib/duc
+duc index /usr -d /usr/lib/duc/duc.db
+
+# drkonqi is noisy
+rm /usr/lib/systemd/user/drkonqi-coredump-launcher.socket
+rm /usr/lib/systemd/user/sockets.target.wants/drkonqi-coredump-launcher.socket
+
+#rm /usr/lib/systemd/network/89-ethernet.network

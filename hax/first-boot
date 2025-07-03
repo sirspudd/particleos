@@ -1,0 +1,75 @@
+#!/bin/bash
+
+gum style --foreground 99 --border double --align center --width 50 "Banana?"
+
+# 1. Asks for a username
+USERNAME=$(gum input --placeholder "rawdog" --header "username")
+
+# Exit early if they leave it blank
+if [ -z "$USERNAME" ]; then
+    USERNAME="muppet"
+fi
+
+# 2. Build the homectl arguments array
+ARGS=(
+  "${USERNAME}"
+  "--shell=/usr/bin/zsh"
+  "--member-of=wheel,systemd-journal,libvirt,libvirt-qemu,uucp,kvm,render,video"
+)
+
+gum log "username: ${USERNAME}"
+
+GITHUBUSERNAME=$(gum input --placeholder "lollypopman" --header "github username (leave blank to avoid pub ssh key import)")
+
+if [ -n "${GITHUBUSERNAME}" ]; then
+    gum log "github username: ${GITHUBUSERNAME}"
+    # If curl succeeds (200 OK), populate the variable and run the block
+    if PUBLIC_KEY=$(curl -fs "https://github.com/${GITHUBUSERNAME}.keys"); then
+        gum log "public key: ${PUBLIC_KEY}"
+        # Double-check it wasn't a 200 OK with an entirely empty file
+        if [ -n "$PUBLIC_KEY" ]; then
+            ARGS+=("--ssh-authorized-keys=$PUBLIC_KEY")
+        fi
+    fi
+fi
+
+#GODUSERNAME=$(gum input --placeholder "shiva" --header "Do you want to name your god? (This will probably break crud)")
+GODUSERNAME="root"
+
+NAMES="${USERNAME}"
+
+if [ -n ${GODUSERNAME} ]; then
+  NAMES="${NAMES} ${GODUSERNAME}"
+fi
+
+# 1. Asks for a username
+HOSTNAME=$(gum input --placeholder "whiskers" --header "What do you call your digital beast of burden")
+
+if [ -z "$HOSTNAME" ]; then
+    HOSTNAME="bananoshammock"
+fi
+
+gum log "hostname: ${HOSTNAME}"
+
+# 3. Asks for a password (hidden input)
+
+PASSWORDDOS="guava"
+while [ "${PASSWORD}" != "${PASSWORDDOS}" ]; do
+  PASSWORD=$(gum input --password --placeholder "ripeplumsahoy" --header "create password")
+  PASSWORDDOS=$(gum input --password --placeholder "ripeplumsahoy" --header "reenter password")
+done
+
+# Wrapper for running the tasks with a pretty spinner
+#gum spin --spinner dot --show-output --title "Configuring crud" -- bash -c "
+    echo ${PASSWORD} | homectl create "${ARGS[@]}"
+    if [ -n "$PUBLIC_KEY" ]; then
+        mkdir -p /root/.ssh
+        echo $PUBLIC_KEY > /root/.ssh/authorized_keys
+    fi
+    echo "root:${USER_PASSWORD}" | chpasswd
+#"
+
+echo '${USERNAME}:524288:65536' >> /etc/subuid
+echo '${USERNAME}:524288:65536' >> /etc/subgid
+
+gum style --foreground 2 --bold "✔ Crud configured"

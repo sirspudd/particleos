@@ -4,10 +4,16 @@
     "gid": 1000,
     "disposition": "regular",
     "enforcePasswordPolicy": false,
+    "shell": "/usr/bin/zsh",
     "memberOf": [
-        "sudo",
         "wheel",
-        "systemd-journal"
+        "systemd-journal",
+        "libvirt",
+        "libvirt-qemu",
+        "uucp",
+        "kvm",
+        "render",
+        "video"
     ],
     "secret": {
         "password": ["particleos"]

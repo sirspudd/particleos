@@ -1,0 +1,55 @@
+[Distribution]
+Distribution=arch
+
+[Output]
+ImageId=ParticleOS
+OutputDirectory=/vortex/%i/output
+
+[Config]
+#Profiles=desktop,kde
+Profiles=bananos,desktop
+
+[Build]
+ToolsTree=no
+WorkspaceDirectory=/vortex/%i/workspace
+CacheDirectory=/vortex/%i/cache
+#PackageCacheDirectory=/data/cache/pacman
+# kinda goofily named, the path to contain the cache (path for pacman)
+PackageCacheDirectory=/data
+Incremental=yes
+#ToolsTreePackageDirectories=/work/cache/pacman/custom
+
+[Content]
+PackageDirectories=/data/cache/pacman/pkg-custom-mkosi
+#VolatilePackageDirectories=/data/cache/pacman/pkg
+CleanPackageMetadata=no
+Keymap=us
+Timezone=US/Pacific
+Locale=C.UTF-8
+#RootPassword=wolfsoup   # Or, use `Autologin=yes` instead.
+Hostname=bananos
+#KernelCommandLine=console=ttyS0 console=tty0
+#SourceDateEpoch=365860800
+
+# I can't actually override mkosi.conf here
+# empty assignment clears everything from mkosi.conf / profiles
+# systemd style clearing; unsurprising
+#KernelCommandLine=
+#KernelCommandLine=
+#        root=dissect
+#        mount.usr=dissect
+#        rw
+#        audit=0
+#        systemd.image_policy=esp=unprotected:xbootldr=unprotected+unused+absent:usr=signed:root=encrypted+absent:swap=encrypted+unused+absent:home=unprotected+absent:=ignore
+#        systemd.image_filter=usr=BananOS_*:usr-verity=BananOS_*:usr-verity-sig=BananOS_*:root=BananOS-*:swap=BananOS-*:home=BananOS-*
+#        ipe.enforce=0
+
+[Runtime]
+Credentials=
+        passwd.plaintext-password.root=particleos
+        tty.serial.hvc0.agetty.autologin=root
+        tty.serial.hvc0.login.noauth=yes
+        tty.console.agetty.autologin=root
+        tty.console.login.noauth=yes
+        tty.virtual.tty1.agetty.autologin=root
+        tty.virtual.tty1.login.noauth=yes

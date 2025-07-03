@@ -1,0 +1,13 @@
+alias gvim='neovide'
+alias vi='nvim'
+alias vim='nvim'
+
+alias journalctl-bananos='journalctl --no-hostname'
+alias journalctl-bananos-current-boot='journalctl-bananos -b0 -o short-monotonic'
+alias journalctl-bananos-current-boot-reversed='journalctl-bananos-current-boot -r'
+alias journalctl-bananos-follow='journalctl-bananos-current-boot -f'
+alias journalctl-bananos-current-boot-precise='journalctl-bananos-current-boot -o short-iso-precise'
+
+alias j='journalctl-bananos-current-boot'
+alias jr='journalctl-bananos-current-boot-reversed'
+alias jf='journalctl-bananos-follow'

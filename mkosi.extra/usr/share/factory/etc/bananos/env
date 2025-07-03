@@ -1,0 +1,3 @@
+. /etc/bananos/alias
+
+export PATH="/usr/lib/qt6/bin:$PATH"

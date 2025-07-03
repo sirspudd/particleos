@@ -1,0 +1,5 @@
+0. Implemented using gum
+1. Asks for a username
+2. Asks if we should create a god user
+3. Asks for a password (ideally does not show password)
+4. asks if we should prepopulate the OS using the github public key associated with username

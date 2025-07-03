@@ -1,0 +1,2 @@
+* plasmalogin/sddm constantly resubmit a broken password (homectl delay causing issues?)
+

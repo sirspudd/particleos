@@ -1,0 +1,34 @@
+[Distribution]
+#Distribution=arch
+Distribution=fedora
+Release=rawhide
+
+[Output]
+ImageId=ParticleOS
+OutputDirectory=/vortex/%i/output
+
+[Config]
+#Profiles=desktop,kde
+Profiles=bananos,kde
+
+[Build]
+ToolsTree=no
+WorkspaceDirectory=/vortex/%i/workspace
+CacheDirectory=/vortex/%i/cache
+#PackageCacheDirectory=/opt/cache/mkosi
+PackageCacheDirectory=/data
+Incremental=yes
+#ToolsTreePackages=
+#    distribution-gpg-keys
+#    dnf5
+#ToolsTreePackageDirectories=/opt/cache/pacman/custom
+
+[Content]
+#VolatilePackageDirectories=/opt/cache/pacman/custom
+CleanPackageMetadata=no
+Keymap=us
+Timezone=US/Pacific
+Locale=C.UTF-8
+RootPassword=wolfsoup   # Or, use `Autologin=yes` instead.
+Hostname=bananos
+#SourceDateEpoch=365860800

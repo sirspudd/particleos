@@ -1,0 +1,109 @@
+#!/bin/bash
+
+for dev in /dev/nvme[0-9]n[0-9]; do echo "=== $dev ==="; nvme id-ns -H "$dev" | grep -E "Relative Performance"; done
+
+# Define a wrapper that checks if gum was aborted
+gum_input() {
+    local output
+    output=$(gum input "$@")
+    # 130 is the exit code gum returns when interrupted by Ctrl+C
+    if [ $? -eq 130 ]; then
+        echo " Aborted." >&2
+        exit 130
+    fi
+    echo "$output"
+}
+
+pondering=true
+while ${pondering}; do
+  gum style --foreground 99 --border double --align center --width 50 "Banana?"
+
+  # 1. Asks for a username
+  username=$(gum_input --placeholder "rawdog" --header "username")
+
+  # Exit early if they leave it blank
+  if [ -z "$username" ]; then
+      username="muppet"
+  fi
+
+  # 2. Build the homectl arguments array
+  args=(
+    "${username}"
+    "--shell=/usr/bin/zsh"
+    "--member-of=wheel,systemd-journal,libvirt,libvirt-qemu,uucp,kvm,render,video"
+    "--luks-sector-size=4096"
+    "--luks-extra-mount-options=compress=zstd:3,acl"
+  )
+
+  gum log "username: ${username}"
+
+  github_username=$(gum_input --placeholder "lollypopman" --header "github username (leave blank to avoid pub ssh key import)")
+
+  if [ -n "${github_username}" ]; then
+      gum log "github username: ${github_username}"
+      # If curl succeeds (200 OK), populate the variable and run the block
+      if raw_keys=$(curl -fs "https://github.com/${github_username}.keys"); then
+          # Flatten newlines to commas so Bash arrays don't break
+          public_key=$(echo "$raw_keys" | paste -sd "," -)
+          gum log "public key loaded successfully"
+
+          if [ -n "$public_key" ]; then
+              args+=("--ssh-authorized-keys=$public_key")
+          fi
+      fi
+  fi
+
+  god_username="root"
+  names="${username}"
+
+  if [ -n "${god_username}" ]; then
+    names="${names} ${god_username}"
+  fi
+
+  # 1. Asks for a username
+  hostname=$(gum_input --placeholder "whiskers" --header "What do you call your digital beast of burden")
+
+  if [ -z "$hostname" ]; then
+      hostname="bananoshammock"
+  fi
+
+  gum log "hostname: ${hostname}"
+
+# homectl makes piping a passwd in a real pain
+#  # 3. Asks for a password (hidden input)
+#  password=""
+#  password_dos="guava"
+#  while [ "${password}" != "${password_dos}" ]; do
+#    password=$(gum_input --password --placeholder "ripeplumsahoy" --header "create password")
+#    if [ -z ${password} ]; then
+#      continue;
+#    fi
+#    password_dos=$(gum_input --password --placeholder "ripeplumsahoy" --header "reenter password")
+#  done
+
+  if gum confirm --affirmative "Send it!" --negative "Pivot" --default=false "Are you sure?"; then
+      gum log "🚀"
+      pondering=false
+  else
+      gum log "Mission cancelled 🛑"
+  fi
+done
+
+# 2. Drop the keys cleanly into root's authorized_keys file if they exist
+if [ -n "$public_key" ]; then
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+    # Convert commas back to standard newlines so the file format is valid for SSH
+    echo "$public_key" | tr "," "\n" > /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+fi
+
+#echo "root:${password}" | chpasswd
+
+# Using double quotes here ensures the variables resolve instead of literal text strings
+echo "${username}:524288:65536" >> /etc/subuid
+echo "${username}:524288:65536" >> /etc/subgid
+
+homectl create "${args[@]}"
+
+#gum style --foreground 2 --bold "✔ Crud configured"

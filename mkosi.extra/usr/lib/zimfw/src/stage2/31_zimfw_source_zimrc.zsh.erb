@@ -1,0 +1,30 @@
+_zimfw_source_zimrc() {
+<%= render_all("src/functions/*.erb") %>
+  {
+    local -ri _zeager=${1}
+    local -i _zfailed=0
+    if [[ ! -e ${_zconfig} ]]; then
+      _zimfw_print -u2 "${_zyellow}Config file not found, will create ${_zbold}${_zconfig}${_znormal}"
+      command mkdir -p ${_zconfig:h} || return 1
+      print -Rn "<%= render_template("src/templates/zimrc") %>" >${_zconfig} || return 1
+    fi
+    if ! source ${_zconfig} || (( _zfailed )); then
+      print -u2 -R "${_zred}Failed to source ${_zbold}${_zconfig}${_znormal}"
+      return 1
+    fi
+    if (( ${#_znames} == 0 )); then
+      print -u2 -R "${_zred}No modules defined in ${_zbold}${_zconfig}${_znormal}"
+      return 1
+    fi
+    # Remove all from _zfpaths, _zfunctions and _zcmds with disabled paths prefixes
+    local zpath zpre
+    for zpath in ${_zdisabled_paths}; do
+      zpre=${zpath}$'\0'
+      _zfpaths=(${_zfpaths:#${zpre}*})
+      _zfunctions=(${_zfunctions:#${zpre}*})
+      _zcmds=(${_zcmds:#${zpre}*})
+    done
+  } always {
+    unfunction zmodule
+  }
+}

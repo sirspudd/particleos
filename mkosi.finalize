@@ -15,3 +15,6 @@ if [ -d "$BUILDROOT/var/lib/dpkg" ]; then
     mkdir -p "$BUILDROOT/usr/share/factory/var/lib"
     mv "$BUILDROOT/var/lib/dpkg" "$BUILDROOT/usr/share/factory/var/lib/dpkg"
 fi
+# duc does not allow you to specify a prefix/offset the indexing; index at runtime
+#mkdir -p ${BUILDROOT}/usr/lib/duc/
+#duc index ${BUILDROOT} -d ${BUILDROOT}/usr/lib/duc/duc.db

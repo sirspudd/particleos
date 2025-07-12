@@ -23,3 +23,5 @@ if [[ -f /usr/lib/tmpfiles.d/20-systemd-userdb.conf.example ]]; then
 fi
 
 echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+
+rm /usr/lib/systemd/network/89-ethernet.network

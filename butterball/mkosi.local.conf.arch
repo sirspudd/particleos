@@ -2,7 +2,7 @@
 Distribution=arch
 
 [Output]
-#ImageId=ParticleOS
+ImageId=ParticleOS
 OutputDirectory=/vortex/%i/output
 
 [Config]
@@ -12,7 +12,7 @@ Profiles=bananos
 [Build]
 WorkspaceDirectory=/vortex/%i/workspace
 CacheDirectory=/vortex/%i/cache
-PackageCacheDirectory=/opt/cache/mkosi
+#PackageCacheDirectory=/opt/cache/mkosi
 Incremental=yes
 #ToolsTreePackageDirectories=/opt/cache/pacman/custom
 

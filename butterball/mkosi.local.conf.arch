@@ -1,0 +1,27 @@
+[Distribution]
+Distribution=arch
+
+[Output]
+#ImageId=ParticleOS
+OutputDirectory=/vortex/%i/output
+
+[Config]
+#Profiles=desktop,kde
+Profiles=bananos
+
+[Build]
+WorkspaceDirectory=/vortex/%i/workspace
+CacheDirectory=/vortex/%i/cache
+PackageCacheDirectory=/opt/cache/mkosi
+Incremental=yes
+#ToolsTreePackageDirectories=/opt/cache/pacman/custom
+
+[Content]
+#VolatilePackageDirectories=/opt/cache/pacman/custom
+CleanPackageMetadata=no
+Keymap=us
+Timezone=US/Pacific
+Locale=C.UTF-8
+RootPassword=wolfsoup   # Or, use `Autologin=yes` instead.
+Hostname=bananos
+#SourceDateEpoch=365860800

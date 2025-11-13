@@ -15,8 +15,11 @@ Profiles=obs
 [Build]
 WorkspaceDirectory=/vortex/%i/workspace
 CacheDirectory=/vortex/%i/cache
-PackageCacheDirectory=/opt/cache/mkosi
+#PackageCacheDirectory=/opt/cache/mkosi
 Incremental=yes
+ToolsTreePackages=
+    distribution-gpg-keys
+    dnf5
 #ToolsTreePackageDirectories=/opt/cache/pacman/custom
 
 [Content]

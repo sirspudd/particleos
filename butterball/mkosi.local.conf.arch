@@ -11,7 +11,7 @@ Profiles=bananos
 
 [Build]
 WorkspaceDirectory=/vortex/%i/workspace
-CacheDirectory=/vortex/%i/cache
+#CacheDirectory=/vortex/%i/cache
 #PackageCacheDirectory=/opt/cache/mkosi
 Incremental=yes
 #ToolsTreePackageDirectories=/opt/cache/pacman/custom

@@ -1,22 +1,22 @@
-# ⸭ ParticleOS
+# ⸭ BananOS
 
-ParticleOS is a fully customizable immutable distribution implementing the
+BananOS is a fully customizable immutable distribution implementing the
 concepts described in
 [Fitting Everything Together](https://0pointer.net/blog/fitting-everything-together.html).
 
-Note that ParticleOS is still in development, and we don't provide any backwards
+Note that BananOS is still in development, and we don't provide any backwards
 compatibility guarantees at all.
 
-The crucial difference that makes ParticleOS unique compared to other immutable
-distributions is that users build the ParticleOS image themselves and sign it
+The crucial difference that makes BananOS unique compared to other immutable
+distributions is that users build the BananOS image themselves and sign it
 with their own keys instead of installing vendor signed images. This allows
 configuring the image to your liking by having full control over which
 distribution is used as the base and which packages are installed into the
 image.
 
-The ParticleOS image is built using [mkosi](https://github.com/systemd/mkosi).
+The BananOS image is built using [mkosi](https://github.com/systemd/mkosi).
 You will need to install the current main branch of mkosi to build current
-ParticleOS images.
+BananOS images.
 
 First, configure the variant you'd like to build in `mkosi.local.conf`. For a
 desktop system, you'll want the `desktop` and one of `gnome`, `kde`, or
@@ -33,19 +33,19 @@ Profiles=desktop,kde
 It is also strongly recommended to write a hashed root password prefixed with
 `hashed:` to `mkosi.rootpw` to allow debugging the system if something breaks.
 
-To build the image, run `mkosi -B -f` from the ParticleOS repository. Currently
+To build the image, run `mkosi -B -f` from the BananOS repository. Currently
 `arch`, `fedora` and `debian` are supported distributions. Implementing support for a
 new distribution (that's already supported in mkosi) is as simple as writing the
 necessary config files to install the required packages for that distribution.
 
-To update the system after installation, you clone the ParticleOS repository
+To update the system after installation, you clone the BananOS repository
 or your fork of it, make sure `mkosi.local.conf` is configured to your liking and
 run `mkosi -B -ff sysupdate -- update --reboot` which will update the system using
 `systemd-sysupdate` and then reboot.
 
 ## Using the OBS profile to fetch a newer systemd
 
-Sometimes ParticleOS adopts systemd features as soon as they get merged into
+Sometimes BananOS adopts systemd features as soon as they get merged into
 systemd without waiting for an official release. That's why we recommend
 enabling the `obs-repos` profile to enable the systemd repositories on OBS
 (https://software.opensuse.org//download.html?project=system%3Asystemd&package=systemd)
@@ -81,8 +81,8 @@ mkosi -f sandbox -- meson compile -C build
 mkosi -t none -f
 ```
 
-Then write the following to `mkosi.local.conf` in the ParticleOS repository to
-use the artifacts from the systemd repository built by mkosi in ParticleOS:
+Then write the following to `mkosi.local.conf` in the BananOS repository to
+use the artifacts from the systemd repository built by mkosi in BananOS:
 
 ```conf
 [Content]
@@ -100,7 +100,7 @@ To build a newer systemd, run `git pull` in the systemd repository followed by
 
 ## Signing keys
 
-ParticleOS images are signed for Secure Boot with the user's keys. To generate a new key,
+BananOS images are signed for Secure Boot with the user's keys. To generate a new key,
 run `mkosi genkey`. The key must be stored safely, it will be required to sign updates.
 
 The key can be stored in a smartcard. Then you have to set the key in `mkosi.local.conf`:
@@ -152,7 +152,7 @@ VerityCertificateSource=provider:pkcs11
 
 ## Prebuilt images
 
-ParticleOS images are built on the [Open Build Service](https://download.opensuse.org/repositories/system:/systemd/)
+BananOS images are built on the [Open Build Service](https://download.opensuse.org/repositories/system:/systemd/)
 and can be downloaded and installed. Currently x86-64 GNOME flavours of Fedora and
 Debian are provided and can be found in the respective "images" directory at the
 aforementioned link.
@@ -164,7 +164,7 @@ than what the respective distributions provide.
 
 Images built using the latest systemd stable branch, instead of main, are also
 provided, in the [system:systemd:stable project](https://build.opensuse.org/project/show/system:systemd:stable)
-project on OBS. The ParticleOS configuration is the same, the only difference is
+project on OBS. The BananOS configuration is the same, the only difference is
 the systemd packages, which should be safer and more stable to use.
 
 The trust model of these images is as follows: any private key material used
@@ -181,7 +181,7 @@ as well.
 
 ## Installation
 
-Before installing ParticleOS, make sure that Secure Boot is in *setup*
+Before installing BananOS, make sure that Secure Boot is in *setup*
 *mode* on the target system. The Secure Boot mode can be configured in
 the UEFI firmware interface of the target system. If there's an
 existing Linux installation on the target system already, run
@@ -190,14 +190,14 @@ interface. At the same time, make sure the UEFI firmware interface is
 password protected so an attacker cannot just disable Secure Boot
 again.
 
-To install ParticleOS with a USB drive, first build the image on an
+To install BananOS with a USB drive, first build the image on an
 existing Linux system as described above. Then, write it to the USB
 drive with `mkosi burn /dev/<usb>`. Once written to the USB drive, plug
 the USB drive into the system onto which you'd like to install
-ParticleOS and boot into the USB drive via the firmware menu. Then,
+BananOS and boot into the USB drive via the firmware menu. Then,
 boot into the "Installer" UKI profile, which runs
 `systemd-sysinstall`. It will prompt for the target drive and any
-other details required, then partition the disk, copy ParticleOS onto
+other details required, then partition the disk, copy BananOS onto
 it, set up the ESP via `bootctl install` and finally install a kernel
 via `bootctl link`. Once it completes, reboot into the target drive
 (i.e not the USB drive) and the default profile (i.e. not the
@@ -205,7 +205,7 @@ installer one) to complete the installation.
 
 If you prefer to drive the install manually, boot into the "Live
 System" UKI profile instead. When you end up in the root shell, run
-`systemd-sysinstall` to install ParticleOS to the system's drive,
+`systemd-sysinstall` to install BananOS to the system's drive,
 then reboot as above. If you invoke `systemd-sysinstall` without
 arguments it will interactively query you for configuration
 parameters, as necessary. You may alternatively configure the new
@@ -228,7 +228,7 @@ to include the firmware regardless of whether a module depends on it.
 
 ## Configuring systemd-homed after installation
 
-After installing ParticleOS and logging into your systemd-homed managed user,
+After installing BananOS and logging into your systemd-homed managed user,
 run the following to configure systemd-homed for the best experience:
 
 ```sh
@@ -244,6 +244,6 @@ systemd-homed is unable to resize the home directory.
 
 ## Default root password and user when booting in a virtual machine
 
-If you boot ParticleOS in a virtual machine using `mkosi vm`, the root password
+If you boot BananOS in a virtual machine using `mkosi vm`, the root password
 is automatically set to `particleos` and a default user `particleos` with password
 `particleos` is created as well.

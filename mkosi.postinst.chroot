@@ -22,20 +22,20 @@ if [[ -f /usr/lib/tmpfiles.d/20-systemd-userdb.conf.example ]]; then
     ln --symbolic 20-systemd-userdb.conf.example /usr/lib/tmpfiles.d/20-systemd-userdb.conf
 fi
 
-# Give ParticleOS its own identity/branding via os-release +
+# Give BananOS its own identity/branding via os-release +
 # issue. Note that we keep the original $ID, $VERSION and $VERSION_ID
 # in place, so that we appear like the original underlying OS in most
 # programmatic ways. However, all "pretty"/"fancy" strings now claim
-# we are ParticleOS. Moreover, use $ID_LIKE to identify ParticleOs as
+# we are BananOS. Moreover, use $ID_LIKE to identify ParticleOs as
 # such in a programmatic way.
 (
     . /usr/lib/os-release
     cat >/usr/lib/os-release <<EOF
-NAME="ParticleOS ($NAME Flavour)"
+NAME="BananOS ($NAME Flavour)"
 ID="$ID"
 ID_LIKE="particleos-$ID"
-PRETTY_NAME="ParticleOS/$NAME $VERSION"
-FANCY_NAME="\033[0;38:2:252:186:3;1;49m⸭\033[0;38:2:252:186:3;49m ParticleOS/$NAME Flavour $VERSION\033[0m"
+PRETTY_NAME="BananOS/$NAME $VERSION"
+FANCY_NAME="\033[0;38:2:252:186:3;1;49m⸭\033[0;38:2:252:186:3;49m BananOS/$NAME Flavour $VERSION\033[0m"
 VERSION="$VERSION"
 VERSION_ID="$VERSION_ID"
 ANSI_COLOR="38:2:252:186:3;1;49"
@@ -45,7 +45,7 @@ HOME_URL="https://github.com/systemd/particleos/"
 EOF
 
     cat >/usr/lib/issue <<EOF
-\e[0;38:2:252:186:3;1;49m▒\e[0m \e[0;38:2:252:186:3;1;49m⸭\e[0;38:2:252:186:3;49m ParticleOS/$NAME Flavour $VERSION\e[0m
+\e[0;38:2:252:186:3;1;49m▒\e[0m \e[0;38:2:252:186:3;1;49m⸭\e[0;38:2:252:186:3;49m BananOS/$NAME Flavour $VERSION\e[0m
 \e[0;38:2:252:186:3;1;49m▒\e[0m Kernel \r on an \m (\l)
 
 EOF

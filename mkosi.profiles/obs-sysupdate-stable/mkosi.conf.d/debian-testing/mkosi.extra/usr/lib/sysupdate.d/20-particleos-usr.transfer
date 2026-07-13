@@ -4,12 +4,12 @@ ProtectVersion=%A
 [Source]
 Type=url-file
 Path=https://download.opensuse.org/repositories/system:/systemd:/stable/debian_testing_images/
-MatchPattern=ParticleOS_@v_%a.usr-%a.@u.raw.zst
+MatchPattern=BananOS_@v_%a.usr-%a.@u.raw.zst
 
 [Target]
 Type=partition
 Path=auto
-MatchPattern=ParticleOS_@v
+MatchPattern=BananOS_@v
 MatchPartitionType=usr
 PartitionFlags=0
 ReadOnly=1

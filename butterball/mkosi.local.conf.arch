@@ -2,7 +2,7 @@
 Distribution=arch
 
 [Output]
-ImageId=ParticleOS
+ImageId=BananOS
 OutputDirectory=/vortex/%i/output
 
 [Config]

@@ -75,7 +75,7 @@ mkdir -p /usr/lib/duc
 duc index /usr -d /usr/lib/duc/duc.db
 
 # drkonqi is noisy
-rm /usr/lib/systemd/user/drkonqi-coredump-launcher.socket
-rm /usr/lib/systemd/user/sockets.target.wants/drkonqi-coredump-launcher.socket
+# rm /usr/lib/systemd/user/drkonqi-coredump-launcher.socket
+# rm /usr/lib/systemd/user/sockets.target.wants/drkonqi-coredump-launcher.socket
 
 #rm /usr/lib/systemd/network/89-ethernet.network

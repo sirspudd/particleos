@@ -68,6 +68,9 @@ rm -Rf \
 
 fc-cache -f
 
+# just learned this is dirty; good, I am dirty
+mv /opt /usr
+
 # goofy; duc does not create the directory tree
 # goofier; only /usr is going so this provisioning has to be under /usr if we want it packed
 #mkdir -p /root/.cache/duc

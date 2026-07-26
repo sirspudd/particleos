@@ -77,6 +77,8 @@ mv /opt /usr
 mkdir -p /usr/lib/duc
 duc index /usr -d /usr/lib/duc/duc.db
 
+sed -i 's|/opt/google/|/usr/opt/google/|g' /bin/google-chrome-beta
+
 # drkonqi is noisy
 # rm /usr/lib/systemd/user/drkonqi-coredump-launcher.socket
 # rm /usr/lib/systemd/user/sockets.target.wants/drkonqi-coredump-launcher.socket

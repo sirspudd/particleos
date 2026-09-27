@@ -66,6 +66,24 @@ rm -Rf \
         /usr/lib/firmware/intel \
         /usr/lib/firmware/intel-ucode
 
+# Noto CJK is one static collection per weight and those files barely compress
+# (~226 MiB in the usr partition). One Sans face is enough. Keep
+# NotoSansCJK-Regular.ttc and drop Serif and the other Sans weights before
+# fc-cache so the font cache matches the tree. RemoveFiles= in the arch
+# bananos config repeats this for the final image.
+if [[ -d /usr/share/fonts/noto-cjk ]]; then
+    find /usr/share/fonts/noto-cjk -type f \
+        ! -name 'NotoSansCJK-Regular.ttc' \
+        -delete
+fi
+
+# Omarchy theme config (colors, neovim, vscode) is tiny. The space is wallpaper
+# and preview images under each theme, ~110 MiB, which barely compress.
+if [[ -d /usr/share/omarchy/themes ]]; then
+    find /usr/share/omarchy/themes -type d -name backgrounds -prune -exec rm -rf {} +
+    find /usr/share/omarchy/themes -type f \( -name '*.png' -o -name '*.jpg' \) -delete
+fi
+
 fc-cache -f
 
 # just learned this is dirty; good, I am dirty
@@ -75,6 +93,12 @@ mv /opt /usr
 # goofier; only /usr is going so this provisioning has to be under /usr if we want it packed
 #mkdir -p /root/.cache/duc
 mkdir -p /usr/lib/duc
+# duc compresses index records (RECORD_COMP_ZSTD) unless --uncompressed is
+# passed. This duc-git build still writes ~500 MiB because its Tkrzw HashDBM
+# open string is malformed ("offset_,num_buckets=100ets=10000000000"), so
+# tkrzw falls back to a ~1e8-bucket table of 5-byte offsets. That table is
+# almost all zero bytes and is not covered by record compression. The erofs
+# image shrinks it to ~2 MiB; the workspace file stays ~479 MiB.
 duc index /usr -d /usr/lib/duc/duc.db
 
 sed -i 's|/opt/google/|/usr/opt/google/|g' /bin/google-chrome-beta

@@ -92,14 +92,14 @@ mv /opt /usr
 # goofy; duc does not create the directory tree
 # goofier; only /usr is going so this provisioning has to be under /usr if we want it packed
 #mkdir -p /root/.cache/duc
-mkdir -p /usr/lib/duc
+#mkdir -p /usr/lib/duc
 # duc compresses index records (RECORD_COMP_ZSTD) unless --uncompressed is
 # passed. This duc-git build still writes ~500 MiB because its Tkrzw HashDBM
 # open string is malformed ("offset_,num_buckets=100ets=10000000000"), so
 # tkrzw falls back to a ~1e8-bucket table of 5-byte offsets. That table is
 # almost all zero bytes and is not covered by record compression. The erofs
 # image shrinks it to ~2 MiB; the workspace file stays ~479 MiB.
-duc index /usr -d /usr/lib/duc/duc.db
+#duc index /usr -d /usr/lib/duc/duc.db
 
 sed -i 's|/opt/google/|/usr/opt/google/|g' /bin/google-chrome-beta
 

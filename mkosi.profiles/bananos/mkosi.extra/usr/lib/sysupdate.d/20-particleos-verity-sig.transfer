@@ -3,7 +3,7 @@ ProtectVersion=%A
 
 [Source]
 Type=url-file
-Path=https://download.opensuse.org/repositories/system:/systemd:/stable/%o_%w_images/
+Path=http://192.168.50.51:8081/
 MatchPattern=BananOS_@v_%a.usr-%a-verity-sig.@u.raw.zst
 
 [Target]

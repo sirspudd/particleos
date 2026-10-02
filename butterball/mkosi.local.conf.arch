@@ -7,7 +7,7 @@ OutputDirectory=/vortex/%i/output
 
 [Config]
 #Profiles=desktop,kde
-Profiles=bananos,desktop
+Profiles=bananos,desktop,kde
 
 [Build]
 ToolsTree=no

@@ -1,2 +1,2 @@
 [global]
-database /usr/lib/duc/duc.db
+database /var/lib/duc/duc.db

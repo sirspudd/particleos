@@ -1,0 +1,8 @@
+[Containments][<id>]
+alignment=132
+formfactor=2
+location=3
+plugin=org.kde.panel
+
+[Containments][<id>][General]
+lengthMode=1

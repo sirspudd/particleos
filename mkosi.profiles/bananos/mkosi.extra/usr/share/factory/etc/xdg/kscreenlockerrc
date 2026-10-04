@@ -1,0 +1,8 @@
+# The image wallpaper fills empty space with #ffffff. BananOS removes
+# /usr/share/wallpapers, so the lock screen would otherwise be white.
+
+[Greeter]
+WallpaperPlugin=org.kde.color
+
+[Greeter][Wallpaper][org.kde.color][General]
+Color=0,0,0

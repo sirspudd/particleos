@@ -1,11 +1,7 @@
-[Containments][<id>]
-alignment=132
-formfactor=2
-location=3
-plugin=org.kde.panel
-
-[Containments][<id>][General]
-lengthMode=1
+# Panel layout is intentionally absent. Plasma only runs its default panel
+# script when this file has no containments, and a group named <id> is loaded
+# as containment 0, which is a brand new empty panel (the "Add Widgets" bar).
+# 10-bananos-default-panel.js adds the stock panel on first login.
 
 [Containments][2]
 formfactor=0

@@ -8,7 +8,6 @@ enable qemu-guest-agent.service
 enable spice-vdagentd.service
 # enable seatd.service
 enable systemd-resolved.service
-#enable sddm.service
 enable plasmalogin.service
 enable libvirtd.service
 enable dbus-broker.service

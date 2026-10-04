@@ -32,13 +32,15 @@ while ${pondering}; do
     args+=("--luks-sector-size=${sector_size}")
   fi
 
+  default_username=z
+  default_hostname=ponyhof
   # 1. Asks for a username
-  username=$(gum_input --placeholder "rawdog" --header "username")
+  username=$(gum_input --placeholder "${default_username}" --header "username")
 
   # Exit early if they leave it blank
   if [ -z "$username" ]; then
       gum log "🤪"
-      username="z"
+      username="${default_username}"
   fi
   args+=("${username}")
 
@@ -68,10 +70,10 @@ while ${pondering}; do
   fi
 
   # 1. Asks for a username
-  hostname=$(gum_input --placeholder "whiskers" --header "What do you call your digital beast of burden")
+  hostname=$(gum_input --placeholder "${default_hostname}" --header "What do you call your digital beast of burden")
 
   if [ -z "$hostname" ]; then
-      hostname="pony"
+      hostname="${default_hostname}"
   fi
 
   gum log "hostname: ${hostname}"

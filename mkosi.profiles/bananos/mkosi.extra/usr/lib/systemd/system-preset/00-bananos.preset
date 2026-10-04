@@ -31,3 +31,7 @@ enable rtkit-daemon.service
 
 # Modern power, thermal, and performance management
 enable tuned.service
+
+# Plasma session integration from KDE Linux.
+enable systemd-oomd.service
+enable switcheroo-control.service

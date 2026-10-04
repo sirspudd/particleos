@@ -1,0 +1,60 @@
+#!/bin/bash
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+# systemd-repart in the initrd reads partition definitions from the signed
+# /usr, which cannot be edited. Copy them onto /run and pin the swap
+# partition to the size of RAM so hibernation has room for the image.
+
+set -euo pipefail
+
+fallback() {
+    exec systemd-repart --dry-run=no
+}
+
+src=/sysusr/usr/lib/repart.d
+if [[ ! -d $src ]]; then
+    fallback
+fi
+
+mem_kib=
+while read -r key value _; do
+    if [[ $key == MemTotal: ]]; then
+        mem_kib=$value
+        break
+    fi
+done </proc/meminfo
+
+if [[ -z ${mem_kib:-} || $mem_kib -le 0 ]]; then
+    fallback
+fi
+
+# Ceil to a whole GiB, then add one GiB for the LUKS header and for
+# systemd's check that free swap cover 98% of anonymous memory.
+gib=$(( (mem_kib + 1048576 - 1) / 1048576 + 1 ))
+
+shopt -s nullglob
+files=("$src"/*.conf)
+if (( ${#files[@]} == 0 )); then
+    fallback
+fi
+
+mkdir -p /run/repart.d
+for srcfile in "${files[@]}"; do
+    dest=/run/repart.d/${srcfile##*/}
+    : >"$dest"
+    while IFS= read -r line || [[ -n ${line:-} ]]; do
+        printf '%s\n' "$line"
+    done <"$srcfile" >"$dest"
+done
+
+cat >>/run/repart.d/40-swap.conf <<EOF
+
+# Filled in at boot from MemTotal. Weight= no longer applies once min equals max.
+# A priority above 0 lets repart drop swap when the disk cannot hold it.
+SizeMinBytes=${gib}G
+SizeMaxBytes=${gib}G
+Priority=1000
+EOF
+
+echo "Hibernation swap sized to ${gib}G from MemTotal=${mem_kib} KiB"
+exec systemd-repart --dry-run=no --definitions=/run/repart.d

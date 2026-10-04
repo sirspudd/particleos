@@ -1,0 +1,18 @@
+#!/bin/bash
+# SPDX-License-Identifier: LGPL-2.1-or-later
+set -e
+
+# CAP_SYS_NICE lets KWin put specific threads on real-time scheduling and
+# take a higher-priority GPU context than other clients.
+# https://community.kde.org/Distributions/Packaging_Recommendations#KWin_package_configuration
+# Arch's kwin package sets this from its install scriptlet, which is not
+# applied when the image is built.
+if [[ -e /usr/bin/kwin_wayland ]]; then
+    setcap cap_sys_nice=+ep /usr/bin/kwin_wayland
+fi
+
+# Lets Plasma System Monitor read Intel GPU usage.
+# https://community.kde.org/Distributions/Packaging_Recommendations#Ksystemstats_package_configuration
+if [[ -e /usr/lib/ksystemstats_intel_helper ]]; then
+    setcap cap_perfmon=+ep /usr/lib/ksystemstats_intel_helper
+fi

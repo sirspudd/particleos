@@ -29,8 +29,11 @@ enable smartd.service
 # Realtime scheduling for smooth audio (PipeWire)
 enable rtkit-daemon.service
 
-# Modern power, thermal, and performance management
+# Modern power, thermal, and performance management.
+# tuned-ppd is the Plasma power-profile API; the standalone daemon fights it.
+disable power-profiles-daemon.service
 enable tuned.service
+enable tuned-ppd.service
 
 # Plasma session integration from KDE Linux.
 enable systemd-oomd.service

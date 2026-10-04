@@ -32,7 +32,7 @@ while ${pondering}; do
     args+=("--luks-sector-size=${sector_size}")
   fi
 
-  default_username=z
+  default_username=x
   default_hostname=ponyhof
   # 1. Asks for a username
   username=$(gum_input --placeholder "${default_username}" --header "username")

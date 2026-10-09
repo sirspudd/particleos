@@ -1,0 +1,12 @@
+[General]
+Order=steam
+
+[1]
+Description=Hide Titlebars Globally
+noborder=true
+noborderrule=2
+types=1
+
+[General]
+count=1
+rules=1

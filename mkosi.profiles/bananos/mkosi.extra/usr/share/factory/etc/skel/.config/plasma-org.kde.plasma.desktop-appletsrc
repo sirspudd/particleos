@@ -1,9 +1,48 @@
-# Panel layout is intentionally absent. Plasma only runs its default panel
-# script when this file has no containments, and a group named <id> is loaded
-# as containment 0, which is a brand new empty panel (the "Add Widgets" bar).
-# 10-bananos-default-panel.js adds the stock panel on first login.
+[ActionPlugins][0]
+RightButton;NoModifier=org.kde.contextmenu
+
+[ActionPlugins][1]
+RightButton;NoModifier=org.kde.contextmenu
 
 [Containments][2]
+formfactor=2
+immutability=1
+lastScreen=0
+location=4
+plugin=org.kde.panel
+
+[Containments][2][Applets][10]
+immutability=1
+plugin=org.kde.plasma.kickoff
+
+[Containments][2][Applets][11]
+immutability=1
+plugin=org.kde.plasma.pager
+
+[Containments][2][Applets][12]
+immutability=1
+plugin=org.kde.plasma.icontasks
+
+[Containments][2][Applets][13]
+immutability=1
+plugin=org.kde.plasma.marginsseparator
+
+[Containments][2][Applets][14]
+immutability=1
+plugin=org.kde.plasma.systemtray
+
+[Containments][2][Applets][15]
+immutability=1
+plugin=org.kde.plasma.digitalclock
+
+[Containments][2][Applets][16]
+immutability=1
+plugin=org.kde.plasma.showdesktop
+
+[Containments][2][General]
+AppletOrder=10;11;12;13;14;15;16
+
+[Containments][3]
 formfactor=0
 immutability=1
 lastScreen=0
@@ -11,5 +50,5 @@ location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.color
 
-[Containments][2][Wallpaper][org.kde.color][General]
+[Containments][3][Wallpaper][org.kde.color][General]
 Color=0,0,0

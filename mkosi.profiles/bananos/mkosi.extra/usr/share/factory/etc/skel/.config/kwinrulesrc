@@ -1,6 +1,3 @@
-[General]
-Order=steam
-
 [1]
 Description=Hide Titlebars Globally
 noborder=true

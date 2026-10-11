@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+# systemd-remount-fs.service applies this to the mounted btrfs root.
+# compress= covers every subvolume and only data written after the remount.
+
+/dev/mapper/root / btrfs compress=zstd:3 0 0

@@ -112,8 +112,24 @@ mv /opt /usr
 
 sed -i 's|/opt/google/|/usr/opt/google/|g' /bin/google-chrome-beta
 
-# drkonqi is noisy
-# rm /usr/lib/systemd/user/drkonqi-coredump-launcher.socket
-# rm /usr/lib/systemd/user/sockets.target.wants/drkonqi-coredump-launcher.socket
+# libutempter chowns this helper on every boot. /usr is read-only then.
+# An unprivileged build only maps uid 0, so chown to the utmp group returns
+# EINVAL; a root build can still apply it.
+if [[ -f /usr/lib/utempter/utempter ]]; then
+    if getent group utmp >/dev/null; then
+        chown root:utmp /usr/lib/utempter/utempter || true
+        chmod 2755 /usr/lib/utempter/utempter
+    fi
+    cat >/usr/lib/tmpfiles.d/libutempter.conf <<'EOF'
+# SPDX-License-Identifier: LGPL-2.1-or-later
+# Do not adjust this helper at boot. /usr is read-only, and an unprivileged
+# image build cannot assign the utmp group.
+EOF
+fi
+
+# Pickup waits on the journal until RuntimeMaxSec kills it, then the unit is
+# failed, including when there is no crash to report. New crashes still reach
+# DrKonqi through the launcher socket.
+rm -f /usr/lib/systemd/user/plasma-core.target.wants/drkonqi-coredump-pickup.service
 
 #rm /usr/lib/systemd/network/89-ethernet.network

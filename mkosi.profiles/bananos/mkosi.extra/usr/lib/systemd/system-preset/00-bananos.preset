@@ -15,6 +15,8 @@ enable upower.service
 enable udisks2.service
 enable accounts-daemon.service
 enable fstrim.timer
+# sensors-detect writes /etc/conf.d/lm_sensors. Without that file the service
+# calls modprobe with an empty module list, then sensors -s fails.
 enable lm_sensors.service
 enable bluetooth.service
 enable scx_loader.service

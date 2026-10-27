@@ -12,6 +12,13 @@ gum_input() {
     echo "$output"
 }
 
+# Silence kernel and PID 1 console output while we own the tty.
+# systemd-mute-console keeps the console muted until it is terminated, so
+# fork it off, wait for READY=1 and unmute again on exit.
+if mute_pid=$(systemd-notify --fork -- systemd-mute-console); then
+    trap 'kill "${mute_pid}" 2>/dev/null' EXIT
+fi
+
 default_username=toadwart
 default_hostname=ponyhof
 
@@ -23,8 +30,6 @@ while ${pondering}; do
     "--luks-extra-mount-options=compress=zstd:3,acl"
   )
 
-  # we are running under systemd so this mutes our gum app
-  #systemd-mute-console
   clear
   gum style --foreground 99 --border double --align center --width 50 "$(printf '🍌%.0s' $(seq 1 $(nproc 2>/dev/null || sysctl -n hw.ncpu)))"
 

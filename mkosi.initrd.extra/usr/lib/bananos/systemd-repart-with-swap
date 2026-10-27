@@ -4,16 +4,103 @@
 # systemd-repart in the initrd reads partition definitions from the signed
 # /usr, which cannot be edited. Copy them onto /run and pin the swap
 # partition to the size of RAM so hibernation has room for the image.
+#
+# If repart fails and the boot disk has no root partition yet (typically a
+# raw image or USB stick without free space behind it), boot with a tmpfs
+# root instead, as the live profile does, rather than waiting forever for
+# a root partition that will never appear.
 
 set -euo pipefail
 
-fallback() {
-    exec systemd-repart --dry-run=no
+# Prints the whole disk backing /sysusr/usr, looking through dm-verity.
+boot_disk() {
+    local majmin dev slaves
+    majmin=$(while read -r _ _ mm _ mp _; do
+        if [[ $mp == /sysusr/usr ]]; then echo "$mm"; fi
+    done </proc/self/mountinfo)
+    [[ -n $majmin ]] || return 1
+
+    dev=$(readlink -f "/sys/dev/block/$majmin")
+    slaves=("$dev"/slaves/*)
+    if [[ -e ${slaves[0]:-} ]]; then
+        dev=$(readlink -f "${slaves[0]}")
+    fi
+    if [[ -e $dev/partition ]]; then
+        dev=$(readlink -f "$dev/..")
+    fi
+    echo "/dev/${dev##*/}"
+}
+
+# udev's dissect_image builtin tags the boot disk with one
+# ID_DISSECT_PART<n>_DESIGNATOR= property per recognized partition. The
+# initrd has no grep, so match in bash.
+has_root_partition() {
+    local disk props line
+    disk=$(boot_disk) || return 0  # Can't tell, so assume there is one.
+    props=$(udevadm info --query=property --name="$disk") || return 0
+
+    while IFS= read -r line; do
+        if [[ $line =~ ^ID_DISSECT_PART[0-9]+_DESIGNATOR=root$ ]]; then
+            return 0
+        fi
+    done <<<"$props"
+
+    return 1
+}
+
+tmpfs_root() {
+    echo "No root partition and none could be created, falling back to a tmpfs root" >&2
+
+    # Replace the sysroot.mount and root device dependency written by
+    # systemd-gpt-auto-generator. /run/systemd/system takes precedence over
+    # the generator directories, including for same-named drop-ins.
+    mkdir -p /run/systemd/system/initrd-root-device.target.d
+    cat >/run/systemd/system/initrd-root-device.target.d/50-root-device.conf <<EOF
+# Masks the generated root device dependency, there is no root device.
+EOF
+    cat >/run/systemd/system/sysroot.mount <<EOF
+[Unit]
+Description=Root File System (tmpfs fallback)
+Before=initrd-root-fs.target
+
+[Mount]
+What=rootfs
+Where=/sysroot
+Type=tmpfs
+Options=mode=0755,rw
+EOF
+
+    # Same credentials the live profile passes on its command line.
+    # /run carries over into the host and ImportCredential= searches
+    # /run/credstore.
+    mkdir -p -m 0700 /run/credstore
+    printf particleos >/run/credstore/passwd.plaintext-password.root
+    printf root >/run/credstore/agetty.autologin
+    printf yes >/run/credstore/login.noauth
+    chmod 0600 /run/credstore/*
+
+    systemctl daemon-reload
+}
+
+repart() {
+    local rc=0
+    systemd-repart --dry-run=no "$@" || rc=$?
+
+    # 76 and 77 are listed in SuccessExitStatus= of systemd-repart.service.
+    if (( rc == 0 || rc == 76 || rc == 77 )); then
+        exit "$rc"
+    fi
+    if has_root_partition; then
+        exit "$rc"
+    fi
+
+    tmpfs_root
+    exit 0
 }
 
 src=/sysusr/usr/lib/repart.d
 if [[ ! -d $src ]]; then
-    fallback
+    repart
 fi
 
 mem_kib=
@@ -25,7 +112,7 @@ while read -r key value _; do
 done </proc/meminfo
 
 if [[ -z ${mem_kib:-} || $mem_kib -le 0 ]]; then
-    fallback
+    repart
 fi
 
 # Ceil to a whole GiB, then add one GiB for the LUKS header and for
@@ -35,7 +122,7 @@ gib=$(( (mem_kib + 1048576 - 1) / 1048576 + 1 ))
 shopt -s nullglob
 files=("$src"/*.conf)
 if (( ${#files[@]} == 0 )); then
-    fallback
+    repart
 fi
 
 mkdir -p /run/repart.d
@@ -57,4 +144,4 @@ Priority=1000
 EOF
 
 echo "Hibernation swap sized to ${gib}G from MemTotal=${mem_kib} KiB"
-exec systemd-repart --dry-run=no --definitions=/run/repart.d
+repart --definitions=/run/repart.d

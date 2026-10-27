@@ -2,15 +2,27 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
 # mkosi already links Output= at the timestamped disk image. Publish a stable
-# name next to it so libvirt can keep using BananOS.raw.
+# name next to it, carrying over the image's extension (e.g. .raw.zst when
+# CompressOutput= is set) so the link name reflects what it points at.
 
 set -eu
 
-versioned="$OUTPUTDIR/${IMAGE_ID}_${IMAGE_VERSION}_${ARCHITECTURE}"
+name="${IMAGE_ID}_${IMAGE_VERSION}_${ARCHITECTURE}"
+versioned="$OUTPUTDIR/$name"
 
 if [ ! -L "$versioned" ]; then
     echo "No disk image symlink at $versioned" >&2
     exit 1
 fi
 
-ln -sfn "$(readlink "$versioned")" "$OUTPUTDIR/${IMAGE_ID}.raw"
+target="$(readlink "$versioned")"
+ext="${target#"$name"}"
+
+# Drop stable links left over from builds with a different extension.
+for old in "$OUTPUTDIR/${IMAGE_ID}".raw*; do
+    if [ -L "$old" ] && [ "$old" != "$OUTPUTDIR/${IMAGE_ID}$ext" ]; then
+        rm -f "$old"
+    fi
+done
+
+ln -sfn "$target" "$OUTPUTDIR/${IMAGE_ID}$ext"

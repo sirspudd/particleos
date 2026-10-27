@@ -11,6 +11,9 @@ Id_9=a27599ef-8ddb-4e64-bdcd-da3288dcce25
 Number=9
 Rows=3
 
+[Effect-hidecursor]
+InactivityDuration=5
+
 [Plugins]
 desktopchangeosdEnabled=true
 hidecursorEnabled=true

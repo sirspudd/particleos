@@ -19,7 +19,7 @@ enable fstrim.timer
 # calls modprobe with an empty module list, then sensors -s fails.
 enable lm_sensors.service
 enable bluetooth.service
-enable scx_loader.service
+#enable scx_loader.service
 
 # Laptop hardware & power management
 #enable thermald.service

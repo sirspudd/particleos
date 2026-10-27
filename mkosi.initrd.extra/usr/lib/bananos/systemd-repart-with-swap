@@ -70,14 +70,60 @@ Type=tmpfs
 Options=mode=0755,rw
 EOF
 
+    # PID 1 imports /run/credentials/@initrd as system credentials after the
+    # switch to the host, early enough for system.hostname.
+    local creds=/run/credentials/@initrd
+    mkdir -p -m 0700 "$creds"
+
     # Same credentials the live profile passes on its command line.
-    # /run carries over into the host and ImportCredential= searches
-    # /run/credstore.
-    mkdir -p -m 0700 /run/credstore
-    printf particleos >/run/credstore/passwd.plaintext-password.root
-    printf root >/run/credstore/agetty.autologin
-    printf yes >/run/credstore/login.noauth
-    chmod 0600 /run/credstore/*
+    printf particleos >"$creds/passwd.plaintext-password.root"
+    printf root >"$creds/agetty.autologin"
+    printf yes >"$creds/login.noauth"
+
+    # Every tmpfs boot is a first boot, so instead of prompting via first-run
+    # (masked below), set up what its defaults would give: hostname ponyhof
+    # and user toadwart with the same shell and groups, logged straight into
+    # Plasma. The password is "particleos", as for root.
+    printf ponyhof >"$creds/system.hostname"
+    printf /usr/bin/zsh >"$creds/passwd.shell.root"
+
+    cat >"$creds/userdb.transient.user.toadwart" <<'EOF'
+{
+    "userName": "toadwart",
+    "uid": 1000,
+    "gid": 1000,
+    "disposition": "regular",
+    "homeDirectory": "/home/toadwart",
+    "shell": "/usr/bin/zsh",
+    "memberOf": ["wheel", "systemd-journal", "libvirt", "libvirt-qemu", "uucp", "kvm", "render", "video"],
+    "privileged": {
+        "hashedPassword": ["$6$bananoslive$UZwy9.kOXFH29vDgaoIF37dBBkhjl.gEGrdWMd6qd/reocRPs4JmvYwf7hUTFSRUvZvtOmRGa9XZ8Xr.UZJWq/"]
+    }
+}
+EOF
+    cat >"$creds/userdb.transient.group.toadwart" <<'EOF'
+{
+    "groupName": "toadwart",
+    "gid": 1000,
+    "disposition": "regular"
+}
+EOF
+
+    # Numeric ownership, the userdb records may not be loaded yet when
+    # systemd-tmpfiles-setup.service runs.
+    cat >"$creds/tmpfiles.extra" <<'EOF'
+C /home/toadwart 0700 1000 1000 - /usr/share/factory/etc/skel
+Z /home/toadwart - 1000 1000 -
+f /etc/subuid 0644 - - - toadwart:524288:65536\n
+f /etc/subgid 0644 - - - toadwart:524288:65536\n
+f /etc/plasmalogin.conf.d/50-tmpfs-autologin.conf 0644 - - - [Autologin]\nUser=toadwart\nSession=plasma\n
+EOF
+
+    chmod 0400 "$creds"/*
+
+    # Don't prompt for a user that is gone at the next power-off.
+    # /run/systemd/system carries over into the host.
+    ln -sf /dev/null /run/systemd/system/systemd-homed-firstboot.service
 
     systemctl daemon-reload
 }

@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+# Host side replacement for systemd-cryptenroll-firstboot.service, which is
+# masked in the initrd. The initrd has no GPU driver, so when the firmware
+# sets up no framebuffer (e.g. a passed through GPU without its option ROM)
+# the wizard is invisible there. Here we can wait for the GPU driver, as
+# systemd-firstboot.service.d/50-wait-for-display.conf does.
+
+[Unit]
+Description=Interactive Disk Encryption Setup
+Documentation=man:systemd-cryptenroll(1)
+ConditionFirstBoot=yes
+ConditionPathIsEncrypted=/var
+After=systemd-mute-console.socket systemd-vconsole-setup.service
+# Prompt before the first-run user wizard so the two don't fight over the tty.
+Before=systemd-homed-firstboot.service systemd-user-sessions.service first-boot-complete.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-udevadm wait --timeout=15 /dev/dri/card0
+# Ignore failures: there might not be an encrypted volume to enroll into, or the
+# user might decline, neither of which should hold up the boot.
+ExecStart=-systemd-cryptenroll --firstboot --prompt-suppress=password,recovery,fido2 --unlock-headless --mute-console=yes
+StandardOutput=tty
+StandardInput=tty
+StandardError=tty
+TTYReset=yes
+
+[Install]
+WantedBy=multi-user.target

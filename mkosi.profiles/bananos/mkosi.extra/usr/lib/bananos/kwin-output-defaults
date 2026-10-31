@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
 # Print a kwinoutputconfig.json that puts every connected output at its native
-# resolution and the lowest refresh rate >= 59 Hz, with VRR always on. Without
-# a config KWin picks the highest refresh rate with VRR off, which keeps the GPU
-# memory clock pinned. Outputs without VRR support ignore the policy.
+# resolution and the lowest refresh rate >= 59 Hz, with VRR off. Without a
+# config KWin picks the highest refresh rate, which keeps the GPU memory clock
+# pinned.
 #
 # KWin only accepts a saved mode that matches a DRM mode exactly, so the modes
 # are copied from drm_info. edidIdentifier is left out: KWin then matches on
@@ -86,7 +86,7 @@ def main():
                 },
                 "flags": 1 if mode["type"] & DRM_MODE_TYPE_PREFERRED else 0,
             }
-            output["vrrPolicy"] = "Always"
+            output["vrrPolicy"] = "Never"
             outputs.append(output)
             print(f"{name}: {mode['hdisplay']}x{mode['vdisplay']}@{refresh(mode) / 1000:.2f}", file=sys.stderr)
 

@@ -85,7 +85,7 @@ EOF
     # and user toadwart with the same shell and groups, logged straight into
     # Plasma. The password is "particleos", as for root.
     printf ponyhof >"$creds/system.hostname"
-    printf /usr/bin/zsh >"$creds/passwd.shell.root"
+    printf /bin/fish >"$creds/passwd.shell.root"
 
     cat >"$creds/userdb.transient.user.toadwart" <<'EOF'
 {
@@ -94,7 +94,7 @@ EOF
     "gid": 1000,
     "disposition": "regular",
     "homeDirectory": "/home/toadwart",
-    "shell": "/usr/bin/zsh",
+    "shell": "/bin/fish",
     "memberOf": ["wheel", "systemd-journal", "libvirt", "libvirt-qemu", "uucp", "kvm", "render", "video"],
     "privileged": {
         "hashedPassword": ["$6$bananoslive$UZwy9.kOXFH29vDgaoIF37dBBkhjl.gEGrdWMd6qd/reocRPs4JmvYwf7hUTFSRUvZvtOmRGa9XZ8Xr.UZJWq/"]

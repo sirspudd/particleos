@@ -126,6 +126,23 @@ verb="create"
 if homectl inspect ${username} &>/dev/null; then
   verb="update"
 fi
+
+# Start the greeter and the first session at the lowest refresh rate >= 59 Hz
+# instead of KWin's highest. The user's copy goes in through a private skel.
+if [ -x /usr/lib/bananos/kwin-output-defaults ] &&
+   outputs=$(/usr/lib/bananos/kwin-output-defaults); then
+  install -d -o plasmalogin -g plasmalogin /var/lib/plasmalogin/.config
+  printf '%s\n' "${outputs}" > /var/lib/plasmalogin/.config/kwinoutputconfig.json
+  chown plasmalogin:plasmalogin /var/lib/plasmalogin/.config/kwinoutputconfig.json
+
+  if [ "${verb}" = create ]; then
+    skel=$(mktemp -d)
+    cp -a /etc/skel/. "${skel}"
+    mkdir -p "${skel}/.config"
+    printf '%s\n' "${outputs}" > "${skel}/.config/kwinoutputconfig.json"
+    args+=("--skel=${skel}")
+  fi
+fi
 echo "homectl ${verb} ${args[@]}"
 homectl "${verb}" "${args[@]}"
 

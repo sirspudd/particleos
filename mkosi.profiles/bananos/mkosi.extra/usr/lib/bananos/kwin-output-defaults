@@ -1,0 +1,101 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+# Print a kwinoutputconfig.json that puts every connected output at its native
+# resolution and the lowest refresh rate >= 59 Hz, with VRR always on. Without
+# a config KWin picks the highest refresh rate with VRR off, which keeps the GPU
+# memory clock pinned. Outputs without VRR support ignore the policy.
+#
+# KWin only accepts a saved mode that matches a DRM mode exactly, so the modes
+# are copied from drm_info. edidIdentifier is left out: KWin then matches on
+# edidHash and connectorName, while a wrong identifier would match nothing. The
+# setups list is left empty so KWin places the outputs and picks a scale itself.
+
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+DRM_MODE_TYPE_PREFERRED = 1 << 3
+DRM_MODE_FLAG_INTERLACE = 1 << 4
+DRM_MODE_CONNECTED = 1
+MIN_REFRESH = 59000
+
+
+def refresh(mode):
+    return mode["clock"] * 1000 * 1000 // (mode["htotal"] * mode["vtotal"])
+
+
+def choose_mode(modes):
+    modes = [m for m in modes if not m["flags"] & DRM_MODE_FLAG_INTERLACE]
+    preferred = [m for m in modes if m["type"] & DRM_MODE_TYPE_PREFERRED]
+    if not preferred:
+        return None
+    native = max(preferred, key=lambda m: (m["hdisplay"] * m["vdisplay"], refresh(m)))
+    size = (native["hdisplay"], native["vdisplay"])
+    usable = [m for m in modes if (m["hdisplay"], m["vdisplay"]) == size and refresh(m) >= MIN_REFRESH]
+    return min(usable, key=refresh) if usable else native
+
+
+def connector_names():
+    names = {}
+    for path in Path("/sys/class/drm").glob("card*-*"):
+        try:
+            card, name = path.name.split("-", 1)
+            names[(card, int((path / "connector_id").read_text()))] = (name, path)
+        except (OSError, ValueError):
+            pass
+    return names
+
+
+def main():
+    info = json.loads(subprocess.run(["drm_info", "-j"], check=True, capture_output=True).stdout)
+    names = connector_names()
+    outputs = []
+
+    for node, card in info.items():
+        for conn in card.get("connectors", []):
+            key = (Path(node).name, conn["id"])
+            if conn["status"] != DRM_MODE_CONNECTED or key not in names:
+                continue
+            mode = choose_mode(conn["modes"])
+            if not mode:
+                continue
+
+            name, sysfs = names[key]
+            output = {"connectorName": name}
+            edid = (sysfs / "edid").read_bytes()
+            if len(edid) >= 128:
+                output["edidHash"] = hashlib.md5(edid).hexdigest()
+
+            output["mode"] = {
+                "cvt": {
+                    "clock": mode["clock"],
+                    "hdisplay": mode["hdisplay"],
+                    "hsyncStart": mode["hsync_start"],
+                    "hsyncEnd": mode["hsync_end"],
+                    "htotal": mode["htotal"],
+                    "hskew": mode["hskew"],
+                    "vdisplay": mode["vdisplay"],
+                    "vsyncStart": mode["vsync_start"],
+                    "vsyncEnd": mode["vsync_end"],
+                    "vtotal": mode["vtotal"],
+                    "vscan": mode["vscan"],
+                    "flags": mode["flags"],
+                },
+                "flags": 1 if mode["type"] & DRM_MODE_TYPE_PREFERRED else 0,
+            }
+            output["vrrPolicy"] = "Always"
+            outputs.append(output)
+            print(f"{name}: {mode['hdisplay']}x{mode['vdisplay']}@{refresh(mode) / 1000:.2f}", file=sys.stderr)
+
+    if not outputs:
+        sys.exit("No connected outputs found")
+
+    json.dump([{"name": "outputs", "data": outputs}, {"name": "setups", "data": []}], sys.stdout, indent=4)
+    print()
+
+
+if __name__ == "__main__":
+    main()

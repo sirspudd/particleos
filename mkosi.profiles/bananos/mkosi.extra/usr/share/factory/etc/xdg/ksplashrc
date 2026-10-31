@@ -1,0 +1,7 @@
+# Applying a global theme writes Engine=KSplashQML to ~/.config/kdedefaults
+# and reverts the user's own setting, so a skel copy does not survive. [$i]
+# locks the group so neither file can bring the Breeze splash back.
+
+[KSplash][$i]
+Engine=none
+Theme=None

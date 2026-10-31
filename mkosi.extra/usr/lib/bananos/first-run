@@ -25,7 +25,7 @@ default_hostname=ponyhof
 pondering=true
 while ${pondering}; do
   args=(
-    "--shell=/usr/bin/zsh"
+    "--shell=/usr/bin/fish"
     "--member-of=wheel,systemd-journal,libvirt,libvirt-qemu,uucp,kvm,render,video"
     "--luks-extra-mount-options=compress=zstd:3,acl"
   )
@@ -114,9 +114,9 @@ if [ -n "$public_key" ]; then
 fi
 
 #echo "root:${password}" | chpasswd
-chsh root -s /bin/zsh
+chsh root -s /bin/fish
 
-cp /etc/skel/.zshrc /root
+#cp /etc/skel/.fishrc /root
 
 # Using double quotes here ensures the variables resolve instead of literal text strings
 echo "${username}:524288:65536" >> /etc/subuid

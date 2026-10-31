@@ -96,7 +96,7 @@ while ${pondering}; do
 #    password_dos=$(gum_input --password --placeholder "ripeplumsahoy" --header "reenter password")
 #  done
 
-  if gum confirm --affirmative "Send it!" --negative "Pivot" --default=false "Are you happy with the above scrawl?"; then
+  if gum confirm --affirmative "Send it!" --negative "Pivot" --default=true "Are you happy with the above scrawl?"; then
       gum log "🚀🌙"
       pondering=false
   else

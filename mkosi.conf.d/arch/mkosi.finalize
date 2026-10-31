@@ -5,5 +5,8 @@ rm -f "$BUILDROOT/usr/lib/tmpfiles.d/arch.conf"
 rm -f "$BUILDROOT/usr/lib/tmpfiles.d/audit.conf"
 rm -f "$BUILDROOT/usr/lib/tmpfiles.d/openssh.conf"
 
-mkdir "$BUILDROOT/usr/lib/pacman"
-mv "$BUILDROOT/var/lib/pacman/local" "$BUILDROOT/usr/lib/pacman"
+# CleanPackageMetadata=yes already deleted the database.
+if [ -d "$BUILDROOT/var/lib/pacman/local" ]; then
+    mkdir "$BUILDROOT/usr/lib/pacman"
+    mv "$BUILDROOT/var/lib/pacman/local" "$BUILDROOT/usr/lib/pacman"
+fi

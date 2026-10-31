@@ -22,7 +22,7 @@ Incremental=yes
 [Content]
 PackageDirectories=/data/cache/pacman/pkg-custom-mkosi
 #VolatilePackageDirectories=/data/cache/pacman/pkg
-CleanPackageMetadata=no
+CleanPackageMetadata=yes
 Keymap=us
 Timezone=US/Pacific
 Locale=C.UTF-8
